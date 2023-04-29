@@ -4,7 +4,6 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "devStart": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -16,9 +15,7 @@
     "mysql2": "^3.2.1"
   },
   "description": "",
-  "devDependencies": {
-    "nodemon": "^2.0.22"
-  },
+  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "git@github.gatech.edu-akulkarni334:cs4400phase4/backend.git"
