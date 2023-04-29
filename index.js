@@ -105,21 +105,18 @@ app.post("/api/grantPilotLicense", (req, res) => {
   });
 });
 
-app.listen(3001, () => {
-  console.log("Server listening on port 3001");
-});
 
 // Call procedure to add airplane
 app.post("/api/addAirplane", (req, res) => {
   const airlineID = req.body.airlineID;
   const tail_num = req.body.tail_num;
-  const seat_capacity = req.body.seat_capacity;
-  const speed = req.body.speed;
+  const seat_capacity = parseInt(req.body.seat_capacity);
+  const speed = parseInt(req.body.speed);
   const locationID = req.body.locationID;
   const plane_type = req.body.plane_type;
-  const skids = req.body.skids;
-  const propellers = req.body.propellers;
-  const jet_engines = req.body.jet_engines;
+  const skids = Number(req.body.skids);
+  const propellers = parseInt(req.body.propellers);
+  const jet_engines = parseInt(req.body.jet_engines);
   const query = `CALL add_airplane(?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   connection.query(
     query,
@@ -133,9 +130,6 @@ app.post("/api/addAirplane", (req, res) => {
   });
 });
 
-app.listen(3001, () => {
-  console.log("Server listening on port 3001");
-});
 
 // Call procedure to add person
 app.post("/api/addPerson", (req, res) => {
@@ -144,10 +138,10 @@ app.post("/api/addPerson", (req, res) => {
   const last_name = req.body.last_name;
   const taxID = req.body.taxID;
   const locationID = req.body.locationID;
-  const experience = req.body.experience;
+  const experience = parseInt(req.body.experience);
   const flying_airline = req.body.flying_airline;
   const flying_tail = req.body.flying_tail;
-  const miles = req.body.miles;
+  const miles = parseInt(req.body.miles);
   const query = `CALL add_person(?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   connection.query(
     query,
@@ -160,10 +154,6 @@ app.post("/api/addPerson", (req, res) => {
       res.send(results);
     }
   });
-});
-
-app.listen(3001, () => {
-  console.log("Server listening on port 3001");
 });
 
 // Call procedure to offer flight
@@ -189,10 +179,6 @@ app.post("/api/offerFlight", (req, res) => {
   });
 });
 
-app.listen(3001, () => {
-  console.log("Server listening on port 3001");
-});
-
 // Call procedure to purchase ticket
 app.post("/api/purchaseTicket", (req, res) => {
   const ticketID = req.body.ticketID;
@@ -214,9 +200,6 @@ app.post("/api/purchaseTicket", (req, res) => {
   });
 });
 
-app.listen(3001, () => {
-  console.log("Server listening on port 3001");
-});
 
 // Call procedure to add/update leg
 app.post("/api/addupdateLeg", (req, res) => {
@@ -237,9 +220,7 @@ app.post("/api/addupdateLeg", (req, res) => {
   });
 });
 
-app.listen(3001, () => {
-  console.log("Server listening on port 3001");
-});
+
 
 // Call procedure to start route
 app.post("/api/startRoute", (req, res) => {
@@ -258,9 +239,7 @@ app.post("/api/startRoute", (req, res) => {
   });
 });
 
-app.listen(3001, () => {
-  console.log("Server listening on port 3001");
-});
+
 
 // Call procedure to extend route
 app.post("/api/extendRoute", (req, res) => {
@@ -279,9 +258,7 @@ app.post("/api/extendRoute", (req, res) => {
   });
 });
 
-app.listen(3001, () => {
-  console.log("Server listening on port 3001");
-});
+
 
 // Call procedure to land flight
 app.post("/api/flightLanding", (req, res) => {
@@ -299,9 +276,7 @@ app.post("/api/flightLanding", (req, res) => {
   });
 });
 
-app.listen(3001, () => {
-  console.log("Server listening on port 3001");
-});
+
 
 // Call procedure to flight takeoff
 app.post("/api/flightTakeoff", (req, res) => {
@@ -319,9 +294,7 @@ app.post("/api/flightTakeoff", (req, res) => {
   });
 });
 
-app.listen(3001, () => {
-  console.log("Server listening on port 3001");
-});
+
 
 // Call procedure to passengers board
 app.post("/api/passengersBoard", (req, res) => {
@@ -339,9 +312,7 @@ app.post("/api/passengersBoard", (req, res) => {
   });
 });
 
-app.listen(3001, () => {
-  console.log("Server listening on port 3001");
-});
+
 
 // Call procedure to passengers disembark
 app.post("/api/passengersDisembark", (req, res) => {
@@ -359,9 +330,7 @@ app.post("/api/passengersDisembark", (req, res) => {
   });
 });
 
-app.listen(3001, () => {
-  console.log("Server listening on port 3001");
-});
+
 
 // Call procedure to assign pilot
 app.post("/api/assignPilot", (req, res) => {
@@ -376,13 +345,12 @@ app.post("/api/assignPilot", (req, res) => {
       res.sendStatus(500);
     } else {
       res.send(results);
+      console.log(results);
     }
   });
 });
 
-app.listen(3001, () => {
-  console.log("Server listening on port 3001");
-});
+
 
 // Call procedure to recycle crew
 app.post("/api/recycleCrew", (req, res) => {
@@ -400,9 +368,7 @@ app.post("/api/recycleCrew", (req, res) => {
   });
 });
 
-app.listen(3001, () => {
-  console.log("Server listening on port 3001");
-});
+
 
 // Call procedure to retire flight
 app.post("/api/retireFlight", (req, res) => {
@@ -420,9 +386,7 @@ app.post("/api/retireFlight", (req, res) => {
   });
 });
 
-app.listen(3001, () => {
-  console.log("Server listening on port 3001");
-});
+
 
 // Call procedure to remove passenger role
 app.post("/api/removePassengerRole", (req, res) => {
@@ -440,9 +404,7 @@ app.post("/api/removePassengerRole", (req, res) => {
   });
 });
 
-app.listen(3001, () => {
-  console.log("Server listening on port 3001");
-});
+
 
 // Call procedure to remove pilot role
 app.post("/api/removePilotRole", (req, res) => {
@@ -463,5 +425,6 @@ app.post("/api/removePilotRole", (req, res) => {
 app.listen(3001, () => {
   console.log("Server listening on port 3001");
 });
+
 
 
