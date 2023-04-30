@@ -67,13 +67,41 @@ app.get("/api/:table", (req, res) => {
   });
 });
 
+// function that changes the key in the request body to null, false, true, or a number
+// if it's an empty string, then just leave it as an empty string
+const cleanBody = (body) => {
+  const cleanedBody = {};
+  for (const key in body) {
+    const value = body[key];
+    if (value.toLowerCase() === "null") {
+      cleanedBody[key] = null;
+    } else if (value.toLowerCase() === "true") {
+      cleanedBody[key] = true;
+    } else if (value.toLowerCase() === "false") {
+      cleanedBody[key] = false;
+    }
+    // this should be handled individually in case a number is actually a string
+    else if (!isNaN(value)) {
+      cleanedBody[key] = Number(value);
+    } else {
+      cleanedBody[key] = value;
+    }
+  }
+  return cleanedBody;
+};
+
 // Call procedure to add airport
 app.post("/api/addAirport", (req, res) => {
-  const airportID = req.body.airportID;
-  const airport_name = req.body.airport_name;
-  const city = req.body.city;
-  const state = req.body.state;
-  const locationID = req.body.locationID;
+  // make a call to cleanBody
+  const cleanedBody = cleanBody(req.body);
+  console.log("The cleanedBody is ", cleanedBody);
+
+  const airportID = cleanedBody.airportID;
+  const airport_name = cleanedBody.airport_name;
+  const city = cleanedBody.city;
+  const state = cleanedBody.state;
+  const locationID = cleanedBody.locationID;
+
   const query = `CALL add_airport(?, ?, ?, ?, ?)`;
   connection.query(
     query,
@@ -91,11 +119,14 @@ app.post("/api/addAirport", (req, res) => {
 
 // Call procedure to grant pilot license
 app.post("/api/grantPilotLicense", (req, res) => {
-  const personID = req.body.personID;
-  const licenseID = req.body.licenseID;
+  const cleanedBody = cleanBody(req.body);
+  console.log("The cleanedBody is ", cleanedBody);
+
+  const personID = cleanedBody.personID;
+  const license = cleanedBody.license;
 
   const query = `CALL grant_pilot_license(?, ?)`;
-  connection.query(query, [personID, licenseID], (err, results, fields) => {
+  connection.query(query, [personID, license], (err, results, fields) => {
     if (err) {
       console.error("Error granting pilot license: ", err);
       res.sendStatus(500);
@@ -105,131 +136,190 @@ app.post("/api/grantPilotLicense", (req, res) => {
   });
 });
 
-
 // Call procedure to add airplane
 app.post("/api/addAirplane", (req, res) => {
-  const airlineID = req.body.airlineID;
-  const tail_num = req.body.tail_num;
-  const seat_capacity = parseInt(req.body.seat_capacity);
-  const speed = parseInt(req.body.speed);
-  const locationID = req.body.locationID;
-  const plane_type = req.body.plane_type;
-  const skids = Number(req.body.skids);
-  const propellers = parseInt(req.body.propellers);
-  const jet_engines = parseInt(req.body.jet_engines);
+  const cleanedBody = cleanBody(req.body);
+
+  const airlineID = cleanedBody.airlineID;
+  const tail_num = cleanedBody.tail_num;
+  const seat_capacity = cleanedBody.seat_capacity;
+  const speed = cleanedBody.speed;
+  const locationID = cleanedBody.locationID;
+  const plane_type = cleanedBody.plane_type;
+  const skids = cleanedBody.skids;
+  const propellers = cleanedBody.propellers;
+  const jet_engines = cleanedBody.jet_engines;
+
+  console.log(
+    airlineID,
+    tail_num,
+    seat_capacity,
+    speed,
+    locationID,
+    plane_type,
+    skids,
+    propellers,
+    jet_engines
+  );
+
   const query = `CALL add_airplane(?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   connection.query(
     query,
-    [airlineID, tail_num, seat_capacity, speed, locationID, plane_type, skids, propellers, jet_engines], (err, results, fields) => {
-    if (err) {
-      console.error("Error adding airport to database: ", err);
-      res.sendStatus(500);
-    } else {
-      res.send(results);
+    [
+      airlineID,
+      tail_num,
+      seat_capacity,
+      speed,
+      locationID,
+      plane_type,
+      skids,
+      propellers,
+      jet_engines,
+    ],
+    (err, results, fields) => {
+      if (err) {
+        console.error("Error adding airport to database: ", err);
+        res.sendStatus(500);
+      } else {
+        res.send(results);
+      }
     }
-  });
+  );
 });
-
 
 // Call procedure to add person
 app.post("/api/addPerson", (req, res) => {
-  const personID = req.body.personID;
-  const first_name = req.body.first_name;
-  const last_name = req.body.last_name;
-  const taxID = req.body.taxID;
-  const locationID = req.body.locationID;
-  const experience = parseInt(req.body.experience);
-  const flying_airline = req.body.flying_airline;
-  const flying_tail = req.body.flying_tail;
-  const miles = parseInt(req.body.miles);
+  const cleanedBody = cleanBody(req.body);
+  console.log("The cleanedBody is ", cleanedBody);
+
+  const personID = cleanedBody.personID;
+  const first_name = cleanedBody.first_name;
+  const last_name = cleanedBody.last_name;
+  const taxID = cleanedBody.taxID;
+  const locationID = cleanedBody.locationID;
+  const experience = cleanedBody.experience;
+  const flying_airline = cleanedBody.flying_airline;
+  const flying_tail = cleanedBody.flying_tail;
+  const miles = cleanedBody.miles;
   const query = `CALL add_person(?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   connection.query(
     query,
-    [personID, first_name, last_name, taxID, locationID, experience, flying_airline, 
-      flying_tail, miles], (err, results, fields) => {
-    if (err) {
-      console.error("Error adding person to database: ", err);
-      res.sendStatus(500);
-    } else {
-      res.send(results);
+    [
+      personID,
+      first_name,
+      last_name,
+      taxID,
+      locationID,
+      experience,
+      flying_airline,
+      flying_tail,
+      miles,
+    ],
+    (err, results, fields) => {
+      if (err) {
+        console.error("Error adding person to database: ", err);
+        res.sendStatus(500);
+      } else {
+        res.send(results);
+      }
     }
-  });
+  );
 });
 
 // Call procedure to offer flight
 app.post("/api/offerFlight", (req, res) => {
-  const flightID = req.body.flightID;
-  const routeID = req.body.routeID;
-  const support_airline = req.body.support_airline;
-  const support_tail = req.body.support_tail;
-  const progress = req.body.progress;
-  const airplane_status = req.body.airplane_status;
-  const next_time = req.body.next_time;
+  const cleanedBody = cleanBody(req.body);
+  console.log("The cleanedBody is ", cleanedBody);
+
+  const flightID = cleanedBody.flightID;
+  const routeID = cleanedBody.routeID;
+  const support_airline = cleanedBody.support_airline;
+  const support_tail = cleanedBody.support_tail;
+  const progress = cleanedBody.progress;
+  const airplane_status = cleanedBody.airplane_status;
+  const next_time = cleanedBody.next_time;
   const query = `CALL offer_flight(?, ?, ?, ?, ?, ?, ?)`;
   connection.query(
     query,
-    [flightID, routeID, support_airline, support_tail, progress, 
-      airplane_status, next_time], (err, results, fields) => {
-    if (err) {
-      console.error("Error offering flight: ", err);
-      res.sendStatus(500);
-    } else {
-      res.send(results);
+    [
+      flightID,
+      routeID,
+      support_airline,
+      support_tail,
+      progress,
+      airplane_status,
+      next_time,
+    ],
+    (err, results, fields) => {
+      if (err) {
+        console.error("Error offering flight: ", err);
+        res.sendStatus(500);
+      } else {
+        res.send(results);
+      }
     }
-  });
+  );
 });
 
 // Call procedure to purchase ticket
 app.post("/api/purchaseTicket", (req, res) => {
-  const ticketID = req.body.ticketID;
-  const cost = req.body.cost;
-  const carrier = req.body.carrier;
-  const customer = req.body.customer;
-  const deplane_at = req.body.deplane_at;
-  const seat_number = req.body.seat_number;
+  const cleanedBody = cleanBody(req.body);
+  console.log("The cleanedBody is ", cleanedBody);
+
+  const ticketID = cleanedBody.ticketID;
+  const cost = cleanedBody.cost;
+  const carrier = cleanedBody.carrier;
+  const customer = cleanedBody.customer;
+  const deplane_at = cleanedBody.deplane_at;
+  const seat_number = cleanedBody.seat_number;
   const query = `CALL purchase_ticket_and_seat(?, ?, ?, ?, ?, ?)`;
   connection.query(
     query,
-    [ticketID, cost, carrier, customer, deplane_at, seat_number], (err, results, fields) => {
-    if (err) {
-      console.error("Error purchasing ticket: ", err);
-      res.sendStatus(500);
-    } else {
-      res.send(results);
+    [ticketID, cost, carrier, customer, deplane_at, seat_number],
+    (err, results, fields) => {
+      if (err) {
+        console.error("Error purchasing ticket: ", err);
+        res.sendStatus(500);
+      } else {
+        res.send(results);
+      }
     }
-  });
+  );
 });
-
 
 // Call procedure to add/update leg
 app.post("/api/addupdateLeg", (req, res) => {
-  const legID = req.body.legID;
-  const distance = req.body.distance;
-  const departure = req.body.departure;
-  const arrival = req.body.arrival;
+  const cleanedBody = cleanBody(req.body);
+  console.log("The cleanedBody is ", cleanedBody);
+
+  const legID = cleanedBody.legID;
+  const distance = cleanedBody.distance;
+  const departure = cleanedBody.departure;
+  const arrival = cleanedBody.arrival;
   const query = `CALL add_update_leg(?, ?, ?, ?)`;
   connection.query(
     query,
-    [legID, distance, departure, arrival], (err, results, fields) => {
-    if (err) {
-      console.error("Error adding/updating leg: ", err);
-      res.sendStatus(500);
-    } else {
-      res.send(results);
+    [legID, distance, departure, arrival],
+    (err, results, fields) => {
+      if (err) {
+        console.error("Error adding/updating leg: ", err);
+        res.sendStatus(500);
+      } else {
+        res.send(results);
+      }
     }
-  });
+  );
 });
-
-
 
 // Call procedure to start route
 app.post("/api/startRoute", (req, res) => {
-  const routeID = req.body.routeID;
-  const legID = req.body.legID;
+  const cleanedBody = cleanBody(req.body);
+  console.log("The cleanedBody is ", cleanedBody);
+
+  const routeID = cleanedBody.routeID;
+  const legID = cleanedBody.legID;
   const query = `CALL start_route(?, ?)`;
-  connection.query(
-    query,
-    [routeID, legID], (err, results, fields) => {
+  connection.query(query, [routeID, legID], (err, results, fields) => {
     if (err) {
       console.error("Error starting route: ", err);
       res.sendStatus(500);
@@ -239,16 +329,15 @@ app.post("/api/startRoute", (req, res) => {
   });
 });
 
-
-
 // Call procedure to extend route
 app.post("/api/extendRoute", (req, res) => {
-  const routeID = req.body.routeID;
-  const legID = req.body.legID;
+  const cleanedBody = cleanBody(req.body);
+  console.log("The cleanedBody is ", cleanedBody);
+
+  const routeID = cleanedBody.routeID;
+  const legID = cleanedBody.legID;
   const query = `CALL extend_route(?, ?)`;
-  connection.query(
-    query,
-    [routeID, legID], (err, results, fields) => {
+  connection.query(query, [routeID, legID], (err, results, fields) => {
     if (err) {
       console.error("Error extending route: ", err);
       res.sendStatus(500);
@@ -258,15 +347,14 @@ app.post("/api/extendRoute", (req, res) => {
   });
 });
 
-
-
 // Call procedure to land flight
 app.post("/api/flightLanding", (req, res) => {
-  const flightID = req.body.flightID;
+  const cleanedBody = cleanBody(req.body);
+  console.log("The cleanedBody is ", cleanedBody);
+
+  const flightID = cleanedBody.flightID;
   const query = `CALL flight_landing(?)`;
-  connection.query(
-    query,
-    [flightID], (err, results, fields) => {
+  connection.query(query, [flightID], (err, results, fields) => {
     if (err) {
       console.error("Error landing flight: ", err);
       res.sendStatus(500);
@@ -276,15 +364,14 @@ app.post("/api/flightLanding", (req, res) => {
   });
 });
 
-
-
 // Call procedure to flight takeoff
 app.post("/api/flightTakeoff", (req, res) => {
-  const flightID = req.body.flightID;
+  const cleanedBody = cleanBody(req.body);
+  console.log("The cleanedBody is ", cleanedBody);
+
+  const flightID = cleanedBody.flightID;
   const query = `CALL flight_takeoff(?)`;
-  connection.query(
-    query,
-    [flightID], (err, results, fields) => {
+  connection.query(query, [flightID], (err, results, fields) => {
     if (err) {
       console.error("Error in flight takeoff: ", err);
       res.sendStatus(500);
@@ -294,15 +381,14 @@ app.post("/api/flightTakeoff", (req, res) => {
   });
 });
 
-
-
 // Call procedure to passengers board
 app.post("/api/passengersBoard", (req, res) => {
-  const flightID = req.body.flightID;
+  const cleanedBody = cleanBody(req.body);
+  console.log("The cleanedBody is ", cleanedBody);
+
+  const flightID = cleanedBody.flightID;
   const query = `CALL passengers_board(?)`;
-  connection.query(
-    query,
-    [flightID], (err, results, fields) => {
+  connection.query(query, [flightID], (err, results, fields) => {
     if (err) {
       console.error("Error boarding passenger: ", err);
       res.sendStatus(500);
@@ -312,15 +398,14 @@ app.post("/api/passengersBoard", (req, res) => {
   });
 });
 
-
-
 // Call procedure to passengers disembark
 app.post("/api/passengersDisembark", (req, res) => {
-  const flightID = req.body.flightID;
+  const cleanedBody = cleanBody(req.body);
+  console.log("The cleanedBody is ", cleanedBody);
+
+  const flightID = cleanedBody.flightID;
   const query = `CALL passengers_disembark(?)`;
-  connection.query(
-    query,
-    [flightID], (err, results, fields) => {
+  connection.query(query, [flightID], (err, results, fields) => {
     if (err) {
       console.error("Error disembarking passenger: ", err);
       res.sendStatus(500);
@@ -330,16 +415,15 @@ app.post("/api/passengersDisembark", (req, res) => {
   });
 });
 
-
-
 // Call procedure to assign pilot
 app.post("/api/assignPilot", (req, res) => {
-  const flightID = req.body.flightID;
-  const personID = req.body.personID;
+  const cleanedBody = cleanBody(req.body);
+  console.log("The cleanedBody is ", cleanedBody);
+
+  const flightID = cleanedBody.flightID;
+  const personID = cleanedBody.personID;
   const query = `CALL assign_pilot(?, ?)`;
-  connection.query(
-    query,
-    [flightID, personID], (err, results, fields) => {
+  connection.query(query, [flightID, personID], (err, results, fields) => {
     if (err) {
       console.error("Error assigning pilot: ", err);
       res.sendStatus(500);
@@ -350,15 +434,14 @@ app.post("/api/assignPilot", (req, res) => {
   });
 });
 
-
-
 // Call procedure to recycle crew
 app.post("/api/recycleCrew", (req, res) => {
-  const flightID = req.body.flightID;
+  const cleanedBody = cleanBody(req.body);
+  console.log("The cleanedBody is ", cleanedBody);
+
+  const flightID = cleanedBody.flightID;
   const query = `CALL recycle_crew(?)`;
-  connection.query(
-    query,
-    [flightID], (err, results, fields) => {
+  connection.query(query, [flightID], (err, results, fields) => {
     if (err) {
       console.error("Error recycling crew: ", err);
       res.sendStatus(500);
@@ -368,15 +451,14 @@ app.post("/api/recycleCrew", (req, res) => {
   });
 });
 
-
-
 // Call procedure to retire flight
 app.post("/api/retireFlight", (req, res) => {
-  const flightID = req.body.flightID;
+  const cleanedBody = cleanBody(req.body);
+  console.log("The cleanedBody is ", cleanedBody);
+
+  const flightID = cleanedBody.flightID;
   const query = `CALL retire_flight(?)`;
-  connection.query(
-    query,
-    [flightID], (err, results, fields) => {
+  connection.query(query, [flightID], (err, results, fields) => {
     if (err) {
       console.error("Error retiring flight: ", err);
       res.sendStatus(500);
@@ -386,15 +468,14 @@ app.post("/api/retireFlight", (req, res) => {
   });
 });
 
-
-
 // Call procedure to remove passenger role
 app.post("/api/removePassengerRole", (req, res) => {
-  const personID = req.body.personID;
+  const cleanedBody = cleanBody(req.body);
+  console.log("The cleanedBody is ", cleanedBody);
+
+  const personID = cleanedBody.personID;
   const query = `CALL remove_passenger_role(?)`;
-  connection.query(
-    query,
-    [personID], (err, results, fields) => {
+  connection.query(query, [personID], (err, results, fields) => {
     if (err) {
       console.error("Error removing passenger role: ", err);
       res.sendStatus(500);
@@ -404,17 +485,32 @@ app.post("/api/removePassengerRole", (req, res) => {
   });
 });
 
-
-
 // Call procedure to remove pilot role
 app.post("/api/removePilotRole", (req, res) => {
-  const personID = req.body.personID;
+  const cleanedBody = cleanBody(req.body);
+  console.log("The cleanedBody is ", cleanedBody);
+
+  const personID = cleanedBody.personID;
   const query = `CALL remove_pilot_role(?)`;
-  connection.query(
-    query,
-    [personID], (err, results, fields) => {
+  connection.query(query, [personID], (err, results, fields) => {
     if (err) {
       console.error("Error removing pilot role: ", err);
+      res.sendStatus(500);
+    } else {
+      res.send(results);
+    }
+  });
+});
+
+// Call procedure to simulate flight
+app.post("/api/simulationCycle", (req, res) => {
+  console.log("The request body is ", req.body);
+
+  // this doesn't take any parameters
+  const query = `CALL simulation_cycle()`;
+  connection.query(query, (err, results, fields) => {
+    if (err) {
+      console.error("Error simulating flight: ", err);
       res.sendStatus(500);
     } else {
       res.send(results);
@@ -425,6 +521,3 @@ app.post("/api/removePilotRole", (req, res) => {
 app.listen(3001, () => {
   console.log("Server listening on port 3001");
 });
-
-
-
