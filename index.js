@@ -195,8 +195,8 @@ app.post("/api/addPerson", (req, res) => {
   const personID = cleanedBody.personID;
   const first_name = cleanedBody.first_name;
   const last_name = cleanedBody.last_name;
-  const taxID = cleanedBody.taxID;
   const locationID = cleanedBody.locationID;
+  const taxID = cleanedBody.taxID;
   const experience = cleanedBody.experience;
   const flying_airline = cleanedBody.flying_airline;
   const flying_tail = cleanedBody.flying_tail;
@@ -208,8 +208,8 @@ app.post("/api/addPerson", (req, res) => {
       personID,
       first_name,
       last_name,
-      taxID,
       locationID,
+      taxID,
       experience,
       flying_airline,
       flying_tail,
